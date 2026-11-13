@@ -3,6 +3,7 @@ import shutil
 import tempfile
 
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.staticfiles import finders
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -444,3 +445,27 @@ class PostImageTests(TestCase):
         post = Post.objects.get(titulo="Sin imagen")
         self.assertFalse(bool(post.image))
         self.assertContains(response, "Sin imagen")
+
+
+class StaticPageTests(TestCase):
+    def test_inicio_page(self):
+        response = self.client.get(reverse("posts:inicio"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "posts/inicio.html")
+        self.assertTemplateUsed(response, "posts/base.html")
+        self.assertContains(response, "Bienvenido")
+        self.assertContains(response, "Explorar publicaciones")
+        self.assertContains(response, "Publicaciones")
+        self.assertContains(response, "Acerca")
+
+    def test_acerca_page(self):
+        response = self.client.get(reverse("posts:acerca"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "posts/acerca.html")
+        self.assertTemplateUsed(response, "posts/base.html")
+        self.assertContains(response, "Bruno Antonio Aguilar Hernández")
+        self.assertContains(response, "Propósito del proyecto")
+
+    def test_stylesheet_is_located(self):
+        self.assertIsNotNone(finders.find("posts/css/estilos.css"))
+        self.assertIsNone(finders.find("css/styles.css"))

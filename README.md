@@ -1,212 +1,133 @@
-# Preentrega 9 – Blog Django
+# Preentrega 10 – Blog Django
 
-## Descripción
+Aplicación web desarrollada con Django que permite administrar publicaciones mediante operaciones CRUD (crear, consultar, actualizar y eliminar), incluyendo la carga y visualización de imágenes.
 
-Blog web desarrollado con Django como parte del proyecto final del curso de Python Coderhouse. La aplicación permite a las personas registrarse, iniciar sesión y publicar contenido con texto e imágenes opcionales.
+Este proyecto forma parte de las actividades del curso de Python y continúa el desarrollo de las entregas anteriores, conservando funcionalidades como autenticación de usuarios, permisos, búsqueda, paginación y administración desde Django Admin.
 
-Incluye un listado público de publicaciones, búsqueda por título y contenido, y gestión completa de cada publicación por parte de su autor o del personal del sitio. Cada publicación tiene un estado (**Borrador**, **Publicado** o **Archivado**) y el listado público solo muestra las publicaciones publicadas.
-
-## Tecnologías
+## Tecnologías utilizadas
 
 - Python 3.14.7
-- Django 5.2.18 (LTS)
+- Django 5.2.18
 - SQLite
 - Pillow 13.0.0
-- python-decouple 3.8
-- Bootstrap 5.3.3 (CDN)
-- HTML5, CSS3 y JavaScript
+- python-decouple
+- Bootstrap 5.3.3
+- HTML, CSS y JavaScript
 - Git y GitHub
 
 ## Funcionalidades
 
-- Modelo `Post` con los campos `titulo`, `contenido`, `autor`, `fecha_creacion` y `estado`.
-- Fecha de creación automática mediante `auto_now_add=True`.
-- Estados definidos con `choices`: Borrador, Publicado y Archivado.
-- Listado público que consulta mediante el ORM únicamente las publicaciones en estado Publicado.
-- Vista de detalle de cada publicación; los borradores y archivados solo son visibles para su autor o el staff.
-- Listado público de publicaciones con paginación.
-- Creación, edición y eliminación de publicaciones.
-- Carga opcional de imágenes para las publicaciones.
-- Publicaciones sin imagen con visualización controlada.
-- Registro de usuarios mediante `UserCreationForm`.
-- Inicio y cierre de sesión (el cierre de sesión se realiza por `POST`).
-- Restricción de creación, edición y eliminación según autenticación y autoría.
-- El autor de una publicación o un miembro del staff puede editarla o eliminarla.
-- Búsqueda por título y contenido con `Q` e `icontains`.
-- Mensaje cuando la búsqueda no encuentra coincidencias.
-- Navegación y acciones que cambian según el usuario autenticado.
-- Panel de administración con `PostAdmin` (`admin.ModelAdmin`): listado, filtros, búsqueda y edición del estado.
-- Interfaz responsiva con Bootstrap 5 y estilos propios.
-- Mensajes de confirmación y error.
+### Gestión de publicaciones (CRUD)
 
-## Modelo `Post`
+- **Crear:** registrar nuevas publicaciones.
+- **Consultar:** visualizar el listado y el detalle de cada publicación.
+- **Actualizar:** modificar la información y la imagen de una publicación existente.
+- **Eliminar:** borrar publicaciones mediante una pantalla de confirmación.
 
-| Campo | Tipo | Detalle |
-|---|---|---|
-| `titulo` | `CharField(max_length=200)` | Título de la publicación |
-| `contenido` | `TextField` | Contenido completo |
-| `autor` | `ForeignKey` a `User` | Autor de la publicación (`related_name="posts"`) |
-| `fecha_creacion` | `DateTimeField` | Se completa automáticamente con `auto_now_add=True` |
-| `estado` | `CharField` con `choices` | Borrador, Publicado o Archivado |
-| `image` | `ImageField` | Imagen opcional |
-| `updated_at` | `DateTimeField` | Se actualiza automáticamente con `auto_now=True` |
+Cada publicación contiene título, contenido, autor, estado, fecha de creación e imagen opcional.
 
-- El estado por defecto de una publicación nueva es **Borrador**.
-- El método `__str__` retorna el título de la publicación.
-- Las publicaciones se ordenan por fecha de creación descendente.
+### Gestión de imágenes
 
-## Administración
+El modelo `Post` incorpora el campo:
 
-El modelo está registrado en Django Admin mediante `PostAdmin`, que hereda de `admin.ModelAdmin` e incluye:
-
-- Columnas de título, autor, estado, imagen y fechas.
-- Filtros por estado, fecha de creación y autor.
-- Búsqueda por título, contenido y nombre de usuario del autor.
-- Edición rápida del estado desde el listado.
-- Campos de fecha de creación y actualización como solo lectura.
-
-Para acceder al panel se debe crear un superusuario y abrir `http://127.0.0.1:8000/admin/`.
-
-## Requisitos previos
-
-- Python 3.14 (versión probada: 3.14.7).
-- Git.
-- PowerShell en Windows o una terminal en Linux/macOS.
-
-## Estructura del proyecto
-
-```text
-blog_django/
-├── .env.example
-├── .gitignore
-├── README.md
-├── manage.py
-├── requirements.txt
-├── blog_project/
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── posts/
-│   ├── admin.py
-│   ├── apps.py
-│   ├── forms.py
-│   ├── migrations/
-│   │   ├── 0001_initial.py
-│   │   └── 0002_post_estado_renombres.py
-│   ├── models.py
-│   ├── templates/posts/
-│   ├── tests.py
-│   ├── urls.py
-│   └── views.py
-├── static/css/styles.css
-└── templates/
-    ├── 403.html
-    ├── base.html
-    ├── partials/
-    └── registration/
+```python
+image = models.ImageField(
+    upload_to="posts/",
+    blank=True,
+    null=True,
+    verbose_name="Imagen"
+)
 ```
 
-## Instalación
+El campo `image` permite adjuntar una imagen a cada publicación. Su carácter opcional (`blank=True` y `null=True`) permite crear y conservar publicaciones sin necesidad de cargar una imagen.
+
+Las imágenes se almacenan dentro de la carpeta `media/posts/`.
+
+Para gestionar imágenes se utiliza **Pillow**, biblioteca de Python que permite a Django trabajar con archivos de imagen mediante `ImageField`.
+
+### Configuración de archivos multimedia
+
+En `settings.py` se definen las siguientes configuraciones:
+
+```python
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+```
+
+- `MEDIA_URL`: establece la ruta URL desde la que se accede a los archivos multimedia.
+- `MEDIA_ROOT`: define el directorio del sistema de archivos donde Django almacena los archivos multimedia cargados.
+
+Durante el desarrollo, los archivos multimedia se sirven mediante la configuración de URLs cuando `DEBUG=True`.
+
+En un entorno de producción es necesario configurar un servidor o servicio especializado para servir estos archivos.
+
+### Otras funcionalidades
+
+- Registro, inicio y cierre de sesión.
+- Autenticación de usuarios.
+- Permisos de edición y eliminación para autores y administradores.
+- Gestión de publicaciones mediante estados: borrador, publicado y archivado.
+- Búsqueda de publicaciones.
+- Paginación del listado.
+- Administración de modelos desde Django Admin.
+- Páginas de inicio y acerca de.
+- Mensajes de confirmación y retroalimentación al usuario.
+
+## Instalación y configuración
 
 ### 1. Clonar el repositorio
 
+Una vez publicado el proyecto en GitHub:
+
 ```bash
-git clone https://github.com/EthanTony/Preentrega_8_Coder.git
-cd Preentrega_8_Coder
+git clone <URL-DEL-NUEVO-REPOSITORIO>
+cd <CARPETA-DEL-PROYECTO>
 ```
 
 ### 2. Crear y activar el entorno virtual
 
-**Windows PowerShell:**
+En Windows PowerShell:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.venv\Scripts\Activate.ps1
 ```
 
-**Linux/macOS:**
+### 3. Instalar dependencias
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Si PowerShell bloquea la activación por la política de ejecución, se puede habilitar temporalmente para la sesión actual con:
+Pillow se instala junto con las demás dependencias del proyecto.
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+### 4. Configurar las variables de entorno
+
+Crear un archivo `.env` en la raíz del proyecto y configurar las variables necesarias, tomando como referencia `.env.example`.
+
+Por ejemplo:
+
+```env
+SECRET_KEY=tu_clave_secreta
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-### 3. Instalar las dependencias
+No se debe publicar el archivo `.env` ni compartir sus claves privadas.
 
-```bash
-python -m pip install -r requirements.txt
-```
-
-## Configuración de variables de entorno
-
-El proyecto lee `SECRET_KEY`, `DEBUG` y `ALLOWED_HOSTS` desde un archivo `.env` utilizando `python-decouple`.
-
-1. Copiar el archivo de ejemplo.
-
-   **Windows PowerShell:**
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-   **Linux/macOS:**
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Generar una `SECRET_KEY` nueva:
-
-   ```bash
-   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-   ```
-
-3. Editar `.env` y reemplazar el valor de `SECRET_KEY` por la clave generada:
-
-   ```env
-   SECRET_KEY=tu-clave-generada
-   DEBUG=True
-   ALLOWED_HOSTS=127.0.0.1,localhost
-   ```
-
-El archivo `.env` contiene credenciales locales y está excluido de Git. Nunca debe publicarse. El archivo `.env.example` sí se versiona y no contiene secretos reales.
-
-## Migraciones
-
-Aplicar las migraciones de Django y de la aplicación `posts`:
+### 5. Aplicar migraciones
 
 ```bash
 python manage.py migrate
 ```
 
-La migración `0001_initial` crea el modelo inicial y `0002_post_estado_renombres` adapta los campos a `titulo`, `contenido`, `autor` y `fecha_creacion`, y agrega el campo `estado` sin eliminar los datos existentes.
-
-Comprobar que no existan cambios de modelo pendientes:
-
-```bash
-python manage.py makemigrations --check --dry-run
-```
-
-## Crear un superusuario
-
-Para acceder al panel de administración:
+### 6. Crear un superusuario
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Posteriormente, iniciar sesión en:
-
-`http://127.0.0.1:8000/admin/`
-
-## Ejecutar el servidor
+### 7. Iniciar el servidor
 
 ```bash
 python manage.py runserver
@@ -214,64 +135,115 @@ python manage.py runserver
 
 La aplicación estará disponible en:
 
-- Blog: `http://127.0.0.1:8000/`
-- Administración: `http://127.0.0.1:8000/admin/`
-- Login: `http://127.0.0.1:8000/accounts/login/`
-- Registro: `http://127.0.0.1:8000/accounts/register/`
+`http://127.0.0.1:8000/`
 
-Durante `DEBUG=True`, Django sirve los archivos multimedia subidos desde `MEDIA_ROOT`. En producción se debe configurar un servidor web o de archivos para servir `MEDIA_ROOT` y `STATIC_ROOT`.
+## Uso de la aplicación
 
-## Ejecutar las pruebas
+### Crear una publicación con imagen
+
+1. Iniciar sesión con una cuenta registrada.
+2. Acceder a la opción para crear una publicación.
+3. Completar el título y el contenido.
+4. Seleccionar el estado de la publicación.
+5. Elegir una imagen desde el equipo.
+6. Guardar el formulario.
+
+El formulario utiliza `enctype="multipart/form-data"` para permitir el envío de archivos al servidor.
+
+También es posible crear una publicación sin imagen, ya que el campo `image` es opcional.
+
+### Visualizar publicaciones e imágenes
+
+1. Acceder al listado de publicaciones.
+2. Seleccionar una publicación para consultar su detalle.
+3. Cuando existe una imagen asociada, esta se muestra en la página de detalle.
+
+Las publicaciones sin imagen pueden consultarse normalmente.
+
+### Editar una publicación
+
+1. Iniciar sesión con la cuenta propietaria de la publicación o con una cuenta administradora.
+2. Acceder al detalle de la publicación.
+3. Seleccionar la opción de edición.
+4. Modificar los campos necesarios.
+5. Cargar una imagen nueva si se desea reemplazar la anterior.
+6. Guardar los cambios.
+
+### Eliminar una publicación
+
+1. Acceder al detalle de la publicación.
+2. Seleccionar la opción de eliminar.
+3. Revisar la pantalla de confirmación.
+4. Confirmar la eliminación.
+
+### Búsqueda y paginación
+
+El listado permite buscar publicaciones mediante los campos habilitados en el formulario de búsqueda. Los resultados se presentan de manera paginada para facilitar su consulta.
+
+### Administración
+
+Django Admin permite administrar los registros del modelo `Post` y gestionar el contenido del sitio desde el panel administrativo.
+
+Para acceder:
+
+`http://127.0.0.1:8000/admin/`
+
+Se requiere una cuenta con permisos administrativos.
+
+## Pruebas
+
+Para verificar la configuración del proyecto:
 
 ```bash
 python manage.py check
+```
+
+Para ejecutar las pruebas automatizadas:
+
+```bash
 python manage.py test
 ```
 
-Las pruebas cubren el modelo, los estados de publicación, el listado, el detalle, la búsqueda, la creación, la edición, la eliminación, los permisos de autoría, la autenticación, las imágenes y las publicaciones sin imagen.
+Se recomienda comprobar manualmente los siguientes escenarios:
 
-## Rutas principales
+- Crear una publicación con imagen.
+- Crear una publicación sin imagen.
+- Consultar una publicación con imagen.
+- Consultar una publicación sin imagen.
+- Editar una publicación y reemplazar su imagen.
+- Eliminar una publicación mediante la confirmación correspondiente.
+- Verificar la búsqueda y paginación.
+- Comprobar los permisos de edición y eliminación.
 
-| Ruta | Descripción |
-|---|---|
-| `/` | Listado de publicaciones publicadas |
-| `/posts/new/` | Crear publicación (requiere login) |
-| `/posts/<id>/` | Detalle de publicación (publicadas o propias/staff) |
-| `/posts/<id>/edit/` | Editar publicación (autor o staff) |
-| `/posts/<id>/delete/` | Eliminar publicación (autor o staff) |
-| `/accounts/register/` | Registro de usuario |
-| `/accounts/login/` | Inicio de sesión |
-| `/accounts/logout/` | Cierre de sesión por POST |
-| `/admin/` | Panel de administración |
+## Estructura general del proyecto
 
-## Comandos completos para Windows PowerShell
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-Copy-Item .env.example .env
-# Editar .env con una SECRET_KEY nueva
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
-
-## Comandos completos para Linux/macOS
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-cp .env.example .env
-# Editar .env con una SECRET_KEY nueva
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
+```text
+blog_django/
+│
+├── blog_project/
+│   ├── settings.py
+│   └── urls.py
+│
+├── posts/
+│   ├── migrations/
+│   ├── static/
+│   ├── templates/
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+│
+├── media/
+│   └── posts/
+│
+├── templates/
+├── manage.py
+├── requirements.txt
+├── .env.example
+└── README.md
 ```
 
 ## Autor
 
-**Bruno Antonio Aguilar Hernández**
-
-Proyecto final del curso de Python.
+Proyecto desarrollado como parte del curso de Python – Preentrega 10.

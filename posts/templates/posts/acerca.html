@@ -1,0 +1,46 @@
+{% extends "posts/base.html" %}
+
+{% block title %}Acerca de · Blog Django{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <article class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-lg-5">
+                <p class="text-uppercase hero-kicker text-primary mb-2">Acerca de</p>
+                <h1 class="display-6 fw-bold mb-3">Bruno Antonio Aguilar Hernández</h1>
+                <p class="lead text-secondary mb-4">
+                    Estudiante de Antropología Física y desarrollador en formación.
+                </p>
+
+                <p>
+                    Mi nombre es Bruno Antonio Aguilar Hernández. Soy estudiante de Antropología
+                    Física y me encuentro en formación como desarrollador. Me interesa la
+                    programación, el desarrollo web y la aplicación de tecnologías a proyectos
+                    académicos.
+                </p>
+
+                <h2 class="h4 mt-4 mb-2">Propósito del proyecto</h2>
+                <p>
+                    Este blog es un ejercicio práctico para desarrollar una aplicación web y
+                    aplicar conocimientos de programación y desarrollo web. El proyecto permite
+                    publicar contenido, organizar entradas y explorar distintas funcionalidades
+                    construidas con Django.
+                </p>
+
+                <h2 class="h4 mt-4 mb-2">Tecnologías</h2>
+                <ul class="mb-4">
+                    <li>Python</li>
+                    <li>Django</li>
+                    <li>HTML</li>
+                    <li>CSS</li>
+                </ul>
+
+                <a href="{% url 'posts:post_list' %}" class="btn btn-primary px-4">
+                    Explorar publicaciones
+                </a>
+            </div>
+        </article>
+    </div>
+</div>
+{% endblock %}

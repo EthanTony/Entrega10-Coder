@@ -1,0 +1,64 @@
+{% extends "posts/base.html" %}
+
+{% block title %}Inicio · Blog Django{% endblock %}
+
+{% block content %}
+<section class="hero p-4 p-md-5 mb-4 mb-lg-5">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-9">
+            <p class="text-uppercase hero-kicker mb-2">Bienvenido</p>
+            <h1 class="display-5 fw-bold mb-3">Blog Django</h1>
+            <p class="lead text-white-50 mb-3">
+                Este blog es un espacio para compartir publicaciones, ideas y aprendizajes
+                de la comunidad. Su propósito es ofrecer un lugar sencillo donde las personas
+                puedan leer, escribir y conversar sobre distintos temas.
+            </p>
+            <p class="text-white-50 mb-4">
+                El proyecto está desarrollado con Python y Django, e incorpora HTML y CSS
+                para construir una experiencia clara y accesible.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'posts:post_list' %}" class="btn btn-light btn-lg px-4">
+                    Explorar publicaciones
+                </a>
+                <a href="{% url 'posts:acerca' %}" class="btn btn-outline-light btn-lg px-4">
+                    Acerca de
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="h5 mb-2">Publicaciones</h2>
+                <p class="text-secondary mb-0">
+                    Explora las entradas publicadas por la comunidad y encuentra ideas nuevas.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="h5 mb-2">Comunidad</h2>
+                <p class="text-secondary mb-0">
+                    Registra una cuenta para crear tus propias publicaciones y gestionarlas.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="h5 mb-2">Tecnología</h2>
+                <p class="text-secondary mb-0">
+                    Un ejercicio práctico de desarrollo web con Python, Django, HTML y CSS.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

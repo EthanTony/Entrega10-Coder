@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -15,6 +15,14 @@ from django.views.generic import (
 
 from .forms import LoginForm, PostForm, RegisterForm, SearchForm
 from .models import Post
+
+
+def inicio(request):
+    return render(request, "posts/inicio.html")
+
+
+def acerca(request):
+    return render(request, "posts/acerca.html")
 
 
 class PostListView(ListView):
